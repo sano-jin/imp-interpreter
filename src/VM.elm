@@ -25,8 +25,8 @@ type CommRule = Upd AExpTrans
               | Wht BExpTrans CommTrans
               | Whf BExpTrans CommTrans
                 
-type BExpRule = True BExpTrans
-              | False BExpTrans
+type BExpRule = True
+              | False
               | Let AExpTrans AExpTrans 
               | Lef AExpTrans AExpTrans 
               | Nott BExpTrans
@@ -40,48 +40,47 @@ type AExpRule = Num
               | Sum AExpTrans AExpTrans
               | Mul AExpTrans AExpTrans
 
+binop evalExp state exp1 exp2 = 
+    (evalExp exp1 state, evalExp exp2 state)
+                    
 evalAExp : AExp -> State -> (AExpRule, Int)
 evalAExp aExp state =
-    let binop aExp1 aExp2 = 
-            (evalAExp aExp1 state, evalAExp aExp2 state)
-    in
-        case aExp of
-            IP.Num num -> (Num, num)
-            IP.Var var -> case D.get var state of
-                              Just num -> (Var, num)
-                              Nothing -> (Var, 0)
-            IP.Sum aExp1 aExp2 ->
-                let ((aExpRule1, result1), (aExpRule2, result2)) = binop aExp1 aExp2 in
-                (Sum ((aExp1, state), result1, aExpRule1)
-                     ((aExp1, state), result1, aExpRule1)
-                , result1 + result2)
-            IP.Mul aExp1 aExp2 ->
-                let ((aExpRule1, result1), (aExpRule2, result2)) = binop aExp1 aExp2 in
-                (Mul ((aExp1, state), result1, aExpRule1)
-                     ((aExp1, state), result1, aExpRule1)
-                , result1 * result2)
+    let binopAExp = binop evalAExp state in
+    case aExp of
+        IP.Num num -> (Num, num)
+        IP.Var var -> case D.get var state of
+                          Just num -> (Var, num)
+                          Nothing -> (Var, 0)
+        IP.Sum aExp1 aExp2 ->
+            let ((aExpRule1, result1), (aExpRule2, result2)) = binopAExp aExp1 aExp2 in
+            (Sum ((aExp1, state), result1, aExpRule1)
+                 ((aExp1, state), result1, aExpRule1)
+            , result1 + result2)
+        IP.Mul aExp1 aExp2 ->
+            let ((aExpRule1, result1), (aExpRule2, result2)) = binopAExp aExp1 aExp2 in
+            (Mul ((aExp1, state), result1, aExpRule1)
+                 ((aExp1, state), result1, aExpRule1)
+            , result1 * result2)
                 
-evalAExp : AExp -> State -> (AExpRule, Int)
-evalAExp aExp state =
-    let binop aExp1 aExp2 = 
-            (evalAExp aExp1 state, evalAExp aExp2 state)
-    in
-        case aExp of
-            IP.Num num -> (Num, num)
-            IP.Var var -> case D.get var state of
-                              Just num -> (Var, num)
-                              Nothing -> (Var, 0)
-            IP.Sum aExp1 aExp2 ->
-                let ((aExpRule1, result1), (aExpRule2, result2)) = binop aExp1 aExp2 in
-                (Sum ((aExp1, state), result1, aExpRule1)
-                     ((aExp1, state), result1, aExpRule1)
-                , result1 + result2)
-            IP.Mul aExp1 aExp2 ->
-                let ((aExpRule1, result1), (aExpRule2, result2)) = binop aExp1 aExp2 in
-                (Mul ((aExp1, state), result1, aExpRule1)
-                     ((aExp1, state), result1, aExpRule1)
-                , result1 * result2)
-                
+evalBExp : BExp -> State -> (BExpRule, Bool)
+evalBExp bExp state =
+    let  binopAExp = binop evalAExp state
+         binopBExp = binop evalBExp state in
+    case bExp of
+        IP.Bool Basics.True -> (True, Basics.True)
+        IP.Bool Basics.False -> (False, Basics.False)
+        IP.Le aExp1 aExp2 -> 
+                let ((aExpRule1, result1), (aExpRule2, result2)) = binopAExp aExp1 aExp2
+                    tup = 
+                        (((aExp1, state), result1, aExpRule1)
+                        , ((aExp1, state), result1, aExpRule1)
+                        ) in
+                if result1 <= result2
+                then (uncurry Let tup, Basics.True)
+                else (uncurry Lef tup, Basics.False)
+        _ -> (True, Basics.True)
+             
+             
 evalCommand : Command -> State -> (CommRule, State)
 evalCommand command state =
     case command of
