@@ -6,6 +6,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Parser exposing (run, DeadEnd, Problem (..))
 import ImpParser as IP
+import VM 
 import Set as S
 import Dict as D
 
