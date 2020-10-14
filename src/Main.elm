@@ -6,9 +6,10 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Parser exposing (run, DeadEnd, Problem (..))
 import ImpParser as IP
-import VM 
+import VM as VM
 import Set as S
 import Dict as D
+import Util exposing (..)
 
 -- main                               
 main = Browser.sandbox { init = init
@@ -19,20 +20,19 @@ main = Browser.sandbox { init = init
 -- Model
 type alias Model =
     { input : String
-    , result : String
+    , result : Maybe VM.TransString
     , errors : List DeadEnd
     }
 
 init : Model
 init =
     { input =
-          "<a := 2; if false then while 1 <= 2 & false do skip else skip; skip, {a -> 1, b -> 2}>"
-    , result = ""
+          "<X := Y + 1; if X <= Z then Z := 2 * Y else Z:= 3 * Y, {X -> 0, Y -> 6, Z -> 0}>"
+    , result = Nothing
     , errors = []
     }
 
 -- Update
-
 type Msg
     = Change String
     | Eval String
@@ -44,15 +44,15 @@ update msg model =
             case run IP.parser str of
                         Ok ast ->
                             { model | errors = []
-                            , result = IP.showImp ast }
+                            , result = Just <| uncurry VM.evalThenShow <| Tuple.mapSecond D.fromList ast
+                            }
 
                         Err err -> { model | errors = err
-                                   , result = "error" }
+                                   , result = Nothing }
         Change str ->
             { model | input = str }
 
 -- View
-
 css path =
     node "link" [rel "stylesheet", href path ] []
 
@@ -66,19 +66,23 @@ view model =
         , css "style.css"
         , div [ class "console" ]
             [ input [ class "reader"
-                    , placeholder "input lambda expression \u{23CE}"
+                    , placeholder "<Commands, State>"
                     , value model.input, onInput Change ] []
             , button [ class "submitter"
                      , onClick <| Eval model.input ] [ text "run" ]
-            , div [] [ text model.result ]
+            , div [] [ case model.result of
+                           Just (VM.Trans beforeAfter (transName, _)) ->
+                               text <| beforeAfter ++ " -- " ++ transName
+                           Nothing -> text ""
+                     ]
             , ul [] <|
                 List.map (\err ->
                               li [] [ text <| IP.problem2String err.problem
-                                    , div [] [ text <|
-                                                   "at row: " ++ String.fromInt err.row
-                                                   ++ ", col: " ++ String.fromInt err.col ]
+                                    , div [] [ text <| ", col: " ++ String.fromInt err.col ]
                                     ]
                          ) model.errors
             ]
         ]
     
+
+        

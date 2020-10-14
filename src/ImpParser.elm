@@ -232,7 +232,7 @@ parseState =
     sandwitched "{" "}"
         <| sepBy "," parseCorrespondence
 
-parseImp : Parser (List Command, State)
+parseImp : Parser (Commands, State)
 parseImp =
     sandwitched "<" ">"
     <| succeed Tuple.pair
@@ -240,7 +240,7 @@ parseImp =
         |. lexeme (symbol ",")
         |= parseState
 
-parser : Parser (List Command, State)
+parser : Parser (Commands, State)
 parser =
     succeed identity
        |. spaces
@@ -298,7 +298,7 @@ showState : State -> String
 showState state =
    String.join ", " <| List.map (\(var, int) -> var ++ " -> " ++ String.fromInt int) state
 
-showImp : (List Command, State) -> String
+showImp : (Commands, State) -> String
 showImp (commands, state) =
    "<" ++ showCommands commands ++ ", {" ++ showState state ++ "}>"
    
