@@ -1,45 +1,39 @@
-module Main exposing (main)
+module Main exposing (..)
 
+import Browser
 import Html as H exposing (Html)
-import Browser exposing (..)
 import Katex as K
     exposing
         ( Latex
+        , display
         , human
         , inline
-        , display
         )
 
-init : ()
-init = ()
+init : () -> ()
+init () = ()
         
-passage : List Latex
+passage : Latex
 passage =
-    [ human "We denote by "
-    , inline "\\phi"
-    , human " the formula for which "
-    , display "\\Gamma \\vDash \\phi"
-    ]
+    inline "\\phi"
 
 
 view : Html a
 view =
     let
-        htmlGenerator isDisplayMode stringLatex =
-            case isDisplayMode of
-                Just True ->
-                    H.div [] [ H.text stringLatex ]
-
-                _ ->
-                    H.span [] [ H.text stringLatex ]
+        htmlGenerator _ stringLatex =
+            H.span [] [ H.text stringLatex ]
     in
-        passage
-            |> List.map (K.generate htmlGenerator)
-            |> H.div []
+    passage |> (K.generate htmlGenerator)
 
-main : Program () () (() -> ())
-main = Browser.sandbox
-       { init = ()
-       , view = always view 
-       , update = identity
-       }
+
+main : Program () (() -> ()) (() -> ())
+main =
+    Browser.sandbox
+        { init = init
+        , update = \b a -> always a b
+        , view = always view
+        }    
+
+
+        

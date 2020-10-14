@@ -256,12 +256,12 @@ showCommands commands =
 showCommand : Command -> String
 showCommand command =
     case command of
-        Skip -> "skip"
-        If bExp com1 com2 -> "if " ++ showBExp bExp
-                             ++ " then " ++ showCommands com1
-                             ++ " else " ++ showCommandsWithParen com2
-        While bExp com -> "while " ++ showBExp bExp ++ " do " ++ showCommandsWithParen com
-        Update var aExp -> var ++ " := " ++ showAExp aExp 10
+        Skip -> "\\texttt{skip} "
+        If bExp com1 com2 -> "\\texttt{if } " ++ showBExp bExp
+                             ++ " \\texttt{ then } " ++ showCommands com1
+                             ++ " \\texttt{ else } " ++ showCommandsWithParen com2
+        While bExp com -> " \\texttt{while } " ++ showBExp bExp ++ " \\texttt{ do } " ++ showCommandsWithParen com
+        Update var aExp -> "\\texttt{ " ++ var ++ " } \\texttt{:= } " ++ showAExp aExp 10
 
 showCommandsWithParen : Commands -> String
 showCommandsWithParen commands =
@@ -272,35 +272,35 @@ showCommandsWithParen commands =
 showBExp : BExp -> String
 showBExp bExp =
     case bExp of
-         Bool bool -> if bool then "true" else "false"
-         Le aExp1 aExp2 -> showAExp aExp1 5 ++ " <= " ++ showAExp aExp2 5
-         Not b -> "not " ++ showBExp b
-         And bExp1 bExp2 -> showBExp bExp1 ++ " & " ++ showBExp bExp2
+         Bool bool -> if bool then " \\texttt{true} " else " \\texttt{false} "
+         Le aExp1 aExp2 -> showAExp aExp1 5 ++ " \\leq " ++ showAExp aExp2 5
+         Not b -> " \\neg " ++ showBExp b
+         And bExp1 bExp2 -> showBExp bExp1 ++ " \\land " ++ showBExp bExp2
 
 
 showAExp : AExp -> Int -> String
 showAExp aExp priority =
     case aExp of
         Num int -> String.fromInt int
-        Var var -> var
+        Var var -> "\\texttt{" ++ var ++ "}"
         Sum aExp1 aExp2 ->
             let str = showAExp aExp1 4 ++ " + " ++ showAExp aExp2 4 in
             if priority < 4 then 
                 "(" ++ str ++ ")"
             else str
         Mul aExp1 aExp2 ->
-            let str = showAExp aExp1 3 ++ " * " ++ showAExp aExp2 3 in
+            let str = showAExp aExp1 3 ++ " \\times " ++ showAExp aExp2 3 in
             if priority < 3 then 
                 "(" ++ str ++ ")"
             else str
 
 showState : State -> String
 showState state =
-   String.join ", " <| List.map (\(var, int) -> var ++ " -> " ++ String.fromInt int) state
+   String.join ", " <| List.map (\(var, int) -> " \\texttt{" ++ var ++ "} \\mapsto " ++ String.fromInt int) state
 
 showImp : (Commands, State) -> String
 showImp (commands, state) =
-   "<" ++ showCommands commands ++ ", {" ++ showState state ++ "}>"
+   "\\langle " ++ showCommands commands ++ ", \\{ " ++ showState state ++ " \\} \\rangle"
    
 problem2String : Problem -> String
 problem2String problem = case problem of
@@ -315,3 +315,4 @@ problem2String problem = case problem of
                              Problem str -> "problem " ++ str
                              BadRepeat -> "badrepeat"
                              _ -> "error!"
+
