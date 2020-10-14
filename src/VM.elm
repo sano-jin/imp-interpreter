@@ -27,7 +27,7 @@ type alias CommTrans = (CommState, State, CommRule)
 showCommTrans : CommTrans -> TransString
 showCommTrans (commState, state, commRule) =
     Trans
-    (showCommState commState ++ " -> {" ++ showState state ++ "}")
+    (showCommState commState ++ " --> {" ++ showState state ++ "}")
     <| showCommRule commRule
     
 type alias AExpState = (AExp, State)
@@ -39,7 +39,7 @@ showAExpState (aExp, state) =
 showAExpTrans : AExpTrans -> TransString
 showAExpTrans (aExpState, num, aExpRule) =
     Trans
-    (showAExpState aExpState ++ " -> " ++ String.fromInt num)
+    (showAExpState aExpState ++ " --> " ++ String.fromInt num)
     <| showAExpRule aExpRule
     
 type alias BExpState = (BExp, State)
@@ -52,7 +52,7 @@ showBExpTrans : BExpTrans -> TransString
 showBExpTrans (bExpState, bool, bExpRule) =
     let boolStr = if bool then "ture" else "false" in
     Trans
-    (showBExpState bExpState ++ " -> " ++ boolStr)
+    (showBExpState bExpState ++ " --> " ++ boolStr)
     <| showBExpRule bExpRule
         
 type CommRule = Upd AExpTrans
