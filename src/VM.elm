@@ -71,7 +71,7 @@ showCommRule commRule =
         Ift bt ct      -> ("ift", [ showBExpTrans bt, showCommTrans ct ])
         Iff bt ct      -> ("iff", [ showBExpTrans bt, showCommTrans ct ])
         Wht bt ct1 ct2 -> ("wht", [ showBExpTrans bt, showCommTrans ct1, showCommTrans ct2 ])
-        Whf bt         -> ("wht", [ showBExpTrans bt ])
+        Whf bt         -> ("whf", [ showBExpTrans bt ])
         Seq ct1 ct2    -> ("seq", [ showCommTrans ct1, showCommTrans ct2 ])
                 
 type BExpRule = Bool Bool

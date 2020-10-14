@@ -61,7 +61,9 @@ showTransString transString =
     case transString of
         VM.Trans beforeAfter (transName, transList) ->
             span [ class "node" ] [
-                 div [ class "children" ] <| List.map showTransString transList
+                 div [ class "children" ]
+                     <| List.intersperse (span [ class "padding" ] [])
+                     <| List.map showTransString transList
                 , div [ class "beforeAfter" ] [ text beforeAfter ]
                 , div [ class "trans" ] [ text transName ]
                 ]
@@ -81,11 +83,6 @@ view model =
                     , value model.input, onInput Change ] []
             , button [ class "submitter"
                      , onClick <| Eval model.input ] [ text "run" ]
-            , div [] [ case model.result of
-                           Just transString ->
-                               showTransString transString
-                           Nothing -> text ""
-                     ]
             , ul [] <|
                 List.map (\err ->
                               li [] [ text <| IP.problem2String err.problem
@@ -93,7 +90,13 @@ view model =
                                     ]
                          ) model.errors
             ]
+        , div [ class "derivationTree" ]
+              [ case model.result of
+                    Just transString ->
+                        showTransString transString
+                    Nothing -> text ""
+              ]
         ]
-    
+
 
         
