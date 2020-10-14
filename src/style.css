@@ -43,6 +43,29 @@ body {
     margin: 10px auto;
 }
 
+.node .children {
+    white-space: nowrap;
+    overflow-x : scroll;
+    display: block;
+    border-bottom: 1px solid lightblue;
+    margin: 0 0 10px;
+}
+
+.node {
+    display: inline-block;
+    margin: 0 50px;
+    padding: 10px 5px;
+    position: relative;
+}
+
+.node .trans{
+    position: absolute;
+    right: -2em;
+    bottom: 1.5em;
+    z-index: 1;
+}
+    
+
 .interpreter .console .submitter{
     border: 1px solid gray;
     border-radius: 50px;

@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Html, button, div, input, text, node, ul, li, textarea)
+import Html exposing (Html, button, div, input, text, node, ul, li, textarea, span)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Parser exposing (run, DeadEnd, Problem (..))
@@ -56,6 +56,17 @@ update msg model =
 css path =
     node "link" [rel "stylesheet", href path ] []
 
+showTransString : VM.TransString -> Html Msg
+showTransString transString =
+    case transString of
+        VM.Trans beforeAfter (transName, transList) ->
+            span [ class "node" ] [
+                 div [ class "children" ] <| List.map showTransString transList
+                , div [ class "beforeAfter" ] [ text beforeAfter ]
+                , div [ class "trans" ] [ text transName ]
+                ]
+
+        
 view : Model -> Html Msg
 view model =
     div [ class "interpreter" ]
@@ -71,8 +82,8 @@ view model =
             , button [ class "submitter"
                      , onClick <| Eval model.input ] [ text "run" ]
             , div [] [ case model.result of
-                           Just (VM.Trans beforeAfter (transName, _)) ->
-                               text <| beforeAfter ++ " -- " ++ transName
+                           Just transString ->
+                               showTransString transString
                            Nothing -> text ""
                      ]
             , ul [] <|
