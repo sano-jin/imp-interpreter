@@ -67,7 +67,9 @@ showTransString transString =
                 , div [ class "beforeAfter" ] [ text beforeAfter ]
                 , div [ class "trans" ] [ text transName ]
                 ]
-
+        VM.Terminal expStr ->
+            span [ class "terminal" ] [ text expStr ]
+                
         
 view : Model -> Html Msg
 view model =
