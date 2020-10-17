@@ -27,7 +27,7 @@ type alias Model =
 init : Model
 init =
     { input =
-          "<Z:=0;(Y:=1; while Z + 1 <= X do (Y := 2 * Y; Z := Z +1)), {X -> 2, Y -> 0, Z -> 0}>"
+          "<Z:=0; (Y:=1; while Z+1 <= X do (Y:=2*Y; Z:=Z+1)), {X->2, Y->0, Z->0}>"
     , result = Nothing
     , errors = []
     }
