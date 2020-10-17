@@ -62,14 +62,15 @@ showTransString transString =
         VM.Trans beforeAfter (transName, transList) ->
             span [ class "node" ] [
                  div [ class "children" ]
-                     <| List.intersperse (span [ class "padding" ] [])
+                     <| List.intersperse (span [ class "padding", class "border" ] [])
                      <| List.map showTransString transList
-                , div [ class "beforeAfter" ] [ text beforeAfter ]
-                , div [ class "trans" ] [ text transName ]
-
+                , div [ class "beforeAfter", class "border" ] [
+                      span [ class "text" ] [ text beforeAfter ]
+                     , div [ class "trans" ] [ text transName ]
+                     ]
                 ]
         VM.Terminal expStr ->
-            span [ class "terminal" ] [ text expStr ]
+            span [ class "terminal", class "border" ] [ text expStr ]
                 
         
 view : Model -> Html Msg

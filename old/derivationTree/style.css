@@ -11,7 +11,6 @@ body {
     background: transparent;
     font-family: 'Inconsolata', monospace;
     color: #111;
-    padding: 0 0;
 }
 
 .console {
@@ -30,49 +29,59 @@ body {
     outline: none;
     display: block;
     margin: 10px auto;
-    line-height: 120%;
 }
 
 .derivationTree {
     display: block;
-    margin: 0 20px;
-    overflow-x : scroll;
-
+    margin: 0 20px 0 0;
 }
 
 .node .children {
     white-space: nowrap;
     overflow-x : visible;
     display: block;
-    border-bottom: 1px solid #225;
-    margin: 0 0 0.5em;
+    margin: 0 0;
     padding: 0 0;
 }
 
 .padding {
     display: inline-block;
     width: 3em;
-    height: 2em;
-  /*
+    height: 1em;
+    padding: 0 0;  
     background: pink;
-*/
+    margin: 0 0;
+    border-bottom: 1px solid #333;
+    bottom: 0;
 }
 
 .node {
     display: inline-block;
     margin: 0 0;
-    padding: 0.5em 0;
+    padding: 0 0;
     position: relative;
 }
 
-.node .trans{
+.node .trans {
     position: absolute;
     right: -2em;
-    bottom: 2em;
+    bottom: 0.7em;
     z-index: 2;
     overflow: visible;
 }
-    
+
+.children .beforeAfter {
+    height: 1em;
+
+    position: relative;
+/*
+    background: lightblue;
+*/
+    display: inline-block;
+    border-bottom: 1px solid #333;
+    border-top: 1px solid #333;
+    margin: 0 0 -1px;
+}
 
 .interpreter .console .submitter{
     border: 1px solid #333;
@@ -84,11 +93,53 @@ body {
     text-align: center;
 }
 
+
+.derivationTree .node .node:first-child,
+.derivationTree .node .node:last-child
+{
+    /* background: lime; */
+    /*
+border-bottom: 1px solid transparent;    
+*/
+}
+
+
+
+.derivationTree .node .node::after
+{
+    position: absolute;
+    content: "";
+    width: 50%;
+    height: 1px;
+    right: 0;
+    bottom: 0;
+    background: #333;     
+}
+
+.derivationTree .node .node::before
+{
+    position: absolute;
+    content: "";
+    width: 50%;
+    height: 1px;
+    bottom: 0;
+    left: 0;
+    background: #333;     
+}
+
+
+
+.derivationTree .node .node:first-child::before,
+.derivationTree .node .node:last-child::after
+{
+    width: 0;
+    height: 0;
+}
+
+
 @media only screen and (min-width: 601px) {
     .interpreter *{
-	/*
-	font-size: 16px;
-	*/
+	/* font-size: 16px; */
     }
     .interpreter .console .reader {
 	min-width: 900px;
@@ -101,8 +152,6 @@ body {
     }
     
     .interpreter *{
-	/*
-	font-size: 16px;
-       */
+	/* font-size: 16px; */
     }
 }
