@@ -60,12 +60,12 @@ myInt =
 trueLit : Parser Bool
 trueLit =
     succeed True
-        |. lexeme (symbol "true")
+        |. lexeme (keyword "true")
           
 falseLit : Parser Bool
 falseLit =
     succeed False
-        |. lexeme (symbol "false")
+        |. lexeme (keyword "false")
         
 boolLit : Parser BExp
 boolLit =
@@ -171,11 +171,12 @@ list p =
       
 parseUnaryBool : Parser BExp
 parseUnaryBool =
-    oneOf [ boolLit
-          , (succeed Not 
-            |. lexeme (symbol "not")
-            |= Parser.lazy (\_ -> parseBExp)
-            )
+    oneOf [ backtrackable boolLit
+          , backtrackable
+                (succeed Not 
+                |. lexeme (keyword "not")
+                |= Parser.lazy (\_ -> parseBExp)
+                )
           , backtrackable
                 (succeed Le
                 |= parseAExp 
@@ -192,24 +193,26 @@ parseBExp =
 parseUnaryCommand : Parser Commands
 parseUnaryCommand =
     oneOf [ Parser.map List.singleton <|
-               oneOf [ succeed Skip |. lexeme (symbol "skip")
+               oneOf [ backtrackable
+                           ( succeed Skip
+                           |. lexeme (keyword "skip") )
                      , (succeed Update
                        |= varLit
                        |. lexeme (symbol ":=")
                        |= parseAExp
                        )
                      , (succeed If
-                       |. lexeme (symbol "if")
+                       |. lexeme (keyword "if")
                        |= parseBExp
-                       |. lexeme (symbol "then")
+                       |. lexeme (keyword "then")
                        |= Parser.lazy (\_ -> parseCommands)
-                       |. lexeme (symbol "else")
+                       |. lexeme (keyword "else")
                        |= Parser.lazy (\_ -> parseUnaryCommand)
                        )
                      , (succeed While
-                       |. lexeme (symbol "while")
+                       |. lexeme (keyword "while")
                        |= parseBExp
-                       |. lexeme (symbol "do")
+                       |. lexeme (keyword "do")
                        |= Parser.lazy (\_ -> parseUnaryCommand)
                        )
                      ]
