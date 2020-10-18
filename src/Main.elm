@@ -59,7 +59,8 @@ update msg model =
                               }, sendData <| jsonOfTransString proofTree  )
 
                         Err err -> ( { model | errors = err
-                                    , result = Nothing }, Cmd.none )
+                                    , result = Nothing }, sendData <| Encode.string "error"
+                                   )
         Change str ->
             ( { model | input = str }, Cmd.none )
 

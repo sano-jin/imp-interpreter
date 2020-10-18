@@ -19,8 +19,7 @@
       });
 
       app.ports.sendData.subscribe( ( data ) => {
-          console.log("Data from Elm: ", data);
-
+	  console.log("Data from Elm: ", data);
 	  const tree = document.getElementById( "derivationTree" );
 	  renderProofTree( tree, data );
       });
