@@ -100,12 +100,15 @@ jsonOfTransString transString =
 view : Model -> Html Msg
 view model =
     div [ class "interpreter" ]
-        [ node "link"
-              [rel "stylesheet"
+        [ 
+{--
+          node "link"
+              [ rel "stylesheet"
               , href "https://fonts.googleapis.com/css2?family=Inconsolata:wght@300&display=swap"
               ] []
         , css "style.css"
-        , div [ class "console" ]
+--}
+        div [ class "console" ]
             [ input [ class "reader"
                     , placeholder "<Commands, State>"
                     , value model.input, onInput Change ] []
