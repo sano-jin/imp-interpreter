@@ -3,14 +3,12 @@ body {
 
 .interpreter {
     text-align: center;
-    margin: 20px auto;
     position: relative;
 }
 
-.interpreter *{
-    background: transparent;
+.interpreter * {
     font-family: 'Inconsolata', monospace;
-    color: #111;
+    color: #333;
     padding: 0 0;
 }
 
@@ -20,65 +18,32 @@ body {
 }
     
 .interpreter .console .reader::placeholder {
-  color: #333;
+  color: #aaa;
 }
 
 .interpreter .console .reader {
     text-align: left;
-    border: 1px solid #355;
-    background: rgba(0,0,0,0.05);
+    border: 1px solid lightblue;
+    background: rgba(0,0,0,0.005);
     outline: none;
     display: block;
-    margin: 10px auto;
-    line-height: 120%;
+    padding: 5px 5px;
 }
 
-.derivationTree {
-    display: block;
-    margin: 0 0;
-    overflow-x : scroll;
-
+#derivationTree {
+    line-height: 1.25em
 }
 
-.node .children {
-    white-space: nowrap;
-    overflow-x : visible;
-    display: block;
-    border-bottom: 1px solid #225;
-    margin: 0 0 0.5em;
-    padding: 0 0;
-}
-
-.padding {
-    display: inline-block;
-    width: 3em;
-    height: 2em;
-  /*
-    background: pink;
-*/
-}
-
-.node {
-    display: inline-block;
-    margin: 0 0;
-    padding: 0.5em 0;
-    position: relative;
-}
-
-.node .trans{
-    position: absolute;
-    right: -2em;
-    bottom: 2em;
-    z-index: 2;
-    overflow: visible;
+#derivationTree * {
+    font-family: 'Inconsolata', monospace;    
 }
     
 
 .interpreter .console .submitter{
-    border: 1px solid #333;
+    border: 1px solid lightblue;
     border-radius: 50px;
     height: max;
-    padding: 0 20px;
+    padding: 5px 20px;
     outline: none;
     margin: 10px auto;
     text-align: center;
