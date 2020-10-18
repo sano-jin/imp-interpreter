@@ -1,0 +1,38 @@
+.--proof-tree-wrapper {
+    overflow-x: scroll;
+    white-space: nowrap;
+    padding: 1.5em 10px 0;
+    display: block;
+}
+
+.--proof-tree-node {
+    text-align: center;
+    display: inline-block;
+    position: relative;
+    margin: 0 0 0.75em;
+}
+
+.--proof-tree-padding {
+    display: inline-block;
+    width: 4em;
+    height: 1em;
+}
+    
+.--proof-tree-rule {
+    position: absolute;
+    right: -2em;
+    bottom: -0.5em;
+}
+
+.--proof-tree-consequent {
+    display: inline-block;
+}
+
+.--proof-tree-bar {
+    height: 1px;
+    width: calc(100% + 20px);
+    background: #444;
+    position: absolute;
+    bottom: 1.5em;
+    left: -10px;
+}

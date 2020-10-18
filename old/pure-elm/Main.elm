@@ -1,4 +1,4 @@
-port module Main exposing (..)
+module Main exposing (..)
 
 import Browser
 import Html exposing (Html, button, div, input, text, node, ul, li, textarea, span)
@@ -10,20 +10,13 @@ import VM as VM
 import Set as S
 import Dict as D
 import Util exposing (..)
-import Json.Encode as Encode exposing (..)
 
 -- main                               
-main = Browser.element
-       { init = init
-       , update = update
-       , subscriptions = subscriptions
-       , view = view
-       }
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-  Sub.none
-    
+main = Browser.sandbox { init = init
+                       , update = update
+                       , view = view
+                       }
+         
 -- Model
 type alias Model =
     { input : String
@@ -31,43 +24,38 @@ type alias Model =
     , errors : List DeadEnd
     }
 
-init : () -> ( Model, Cmd Msg )
-init = \_ ->
-       ( { input =
-               "<Z:=0; (Y:=1; while Z+1 <= X do (Y:=2*Y; Z:=Z+1)), {X->2, Y->0, Z->0}>"
-         , result = Nothing
-         , errors = []
-         }
-       , Cmd.none )
-
-port sendData : Value -> Cmd msg
+init : Model
+init =
+    { input =
+          "<Z:=0; (Y:=1; while Z+1 <= X do (Y:=2*Y; Z:=Z+1)), {X->2, Y->0, Z->0}>"
+    , result = Nothing
+    , errors = []
+    }
 
 -- Update
 type Msg
     = Change String
     | Eval String
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> Model
 update msg model =
     case msg of
         Eval str ->
             case run IP.parser str of
                         Ok ast ->
-                            let proofTree = uncurry VM.evalThenShow <| Tuple.mapSecond D.fromList ast in
-                            ( { model | errors = []
-                              , result = Just proofTree
-                              }, sendData <| jsonOfTransString proofTree  )
+                            { model | errors = []
+                            , result = Just <| uncurry VM.evalThenShow <| Tuple.mapSecond D.fromList ast
+                            }
 
-                        Err err -> ( { model | errors = err
-                                    , result = Nothing }, Cmd.none )
+                        Err err -> { model | errors = err
+                                   , result = Nothing }
         Change str ->
-            ( { model | input = str }, Cmd.none )
+            { model | input = str }
 
 -- View
 css path =
     node "link" [rel "stylesheet", href path ] []
 
-{-|
 showTransString : VM.TransString -> Html Msg
 showTransString transString =
     case transString of
@@ -82,21 +70,8 @@ showTransString transString =
                 ]
         VM.Terminal expStr ->
             span [ class "terminal" ] [ text expStr ]
-|-}             
-
-jsonOfTransString : VM.TransString -> Encode.Value
-jsonOfTransString transString =
-    case transString of
-        VM.Trans beforeAfter (transName, transList) ->
-            Encode.object
-                [ ( "antecedents", Encode.list jsonOfTransString transList )
-                , ( "rule", Encode.string transName )
-                , ( "consequent", Encode.string beforeAfter )
-                ]
-        VM.Terminal hypothesis ->
-            Encode.object
-                [ ( "consequent", Encode.string hypothesis ) ]
                 
+        
 view : Model -> Html Msg
 view model =
     div [ class "interpreter" ]
@@ -118,15 +93,12 @@ view model =
                                     ]
                          ) model.errors
             ]
-
-        {--
         , div [ class "derivationTree" ]
               [ case model.result of
                     Just transString ->
                         showTransString transString
                     Nothing -> text ""
               ]
---}
         ]
 
 
