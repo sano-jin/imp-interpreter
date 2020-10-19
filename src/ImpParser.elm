@@ -1,6 +1,7 @@
 module ImpParser exposing (..)
 
 import Parser exposing (..)
+import Parsec exposing (..)
 import Char
 import Set
 import Util exposing (..)
@@ -26,9 +27,6 @@ type alias State = List (String, Int)
    
                  
 -- Lexer
-lexeme : Parser a -> Parser a
-lexeme p = p |. spaces 
-
 varLit : Parser String
 varLit =
     lexeme
@@ -70,80 +68,8 @@ falseLit =
 boolLit : Parser BExp
 boolLit =
     Parser.map Bool <| oneOf [ trueLit, falseLit ]
-    
-               
+                   
 -- Parser
-sandwitched : String -> String -> Parser a -> Parser a
-sandwitched left right p =
-    succeed identity
-        |. lexeme (symbol left)
-        |= p
-        |. lexeme (symbol right)
-
-paren : Parser a -> Parser a
-paren = sandwitched "(" ")"
-
-sepBy1 : String -> Parser a -> Parser (List a)
-sepBy1 sep p =
-    Parser.map List.singleton p |> andThen (flip loop <| sepByHelp sep p)
-
-sepBy : String -> Parser a -> Parser (List a)
-sepBy sep p =
-    oneOf [ sepBy1 sep p, succeed [] ]
-        
-sepByHelp : String -> Parser a -> List a -> Parser (Step (List a) (List a))
-sepByHelp sep p as_ =
-    oneOf
-    [ succeed (\a -> Loop (a::as_))
-    |. lexeme (symbol sep)
-    |= p
-    , succeed ()
-    |> map (\_ -> Done (List.reverse as_))
-    ]
-
-
-sepByEnd : String -> Parser a -> Parser (List a)
-sepByEnd sep p =
-    loop [] <| sepByEndHelp sep p
-
-sepByEnd1 : String -> Parser a -> Parser (List a)
-sepByEnd1 sep p =
-    succeed (::)
-         |= p
-         |= oneOf [ succeed identity
-                        |. lexeme (symbol sep)
-                        |= sepByEnd sep p
-                  , succeed []
-                  ]
-            
-        
-sepByEndHelp : String -> Parser a -> List a -> Parser (Step (List a) (List a))
-sepByEndHelp sep p as_ =
-    oneOf
-    [ p |> andThen (\a -> oneOf [ succeed (Loop (a::as_))
-                                |. lexeme (symbol sep)
-                                , succeed (Done <| List.reverse <| a::as_)
-                                ]
-                   )
-    , succeed ()
-    |> map (\_ -> Done (List.reverse as_))
-    ]
-
-
-sepBy1Fold : (a -> a -> a) -> String -> Parser a -> Parser a
-sepBy1Fold f sep p =
-    p |> andThen (flip loop <| sepBy1FoldHelp f sep p)
-
-sepBy1FoldHelp : (a -> a -> a) -> String -> Parser a -> a -> Parser (Step a a)
-sepBy1FoldHelp f sep p as_ =
-    oneOf
-    [ succeed (\a -> Loop (f as_ a))
-    |. lexeme (symbol sep)
-    |= p
-    , succeed ()
-    |> map (\_ -> Done as_)
-    ]
-
 parseUnaryAExp : Parser AExp
 parseUnaryAExp =
     oneOf
@@ -151,19 +77,17 @@ parseUnaryAExp =
     , Parser.map Num intLit
     , Parser.lazy (\_ -> paren parseSum) ]
 
-
     
 parseMul : Parser AExp
 parseMul =
-   sepBy1Fold Mul "*" parseUnaryAExp
+   sepBy1Foldl Mul "*" parseUnaryAExp
 
     
 parseSum : Parser AExp
 parseSum =
-   sepBy1Fold Sum "+" parseMul
+   sepBy1Foldl Sum "+" parseMul
 
 parseAExp = parseSum    
-
             
 list : Parser a -> Parser (List a)
 list p =
@@ -188,7 +112,7 @@ parseUnaryBool =
 
 parseBExp : Parser BExp
 parseBExp =
-    sepBy1Fold And "&" parseUnaryBool
+    sepBy1Foldr And "&" parseUnaryBool
 
 parseUnaryCommand : Parser Commands
 parseUnaryCommand =
@@ -250,7 +174,6 @@ parser =
        |= parseImp
        |. end 
 
-          
 -- show
 showCommands : Commands -> String
 showCommands commands =
@@ -305,16 +228,3 @@ showImp : (Commands, State) -> String
 showImp (commands, state) =
    "<" ++ showCommands commands ++ ", {" ++ showState state ++ "}>"
    
-problem2String : Problem -> String
-problem2String problem = case problem of
-                             Expecting str -> "expectiong " ++ str 
-                             ExpectingInt -> "expecting int"
-                             ExpectingNumber -> "expecting number"
-                             ExpectingVariable -> "expecting variable"
-                             ExpectingSymbol str -> "expecting symbol " ++ str
-                             ExpectingKeyword str -> "expecting keyword" ++ str
-                             ExpectingEnd -> "execting end"
-                             UnexpectedChar -> "unexpected char"
-                             Problem str -> "problem " ++ str
-                             BadRepeat -> "badrepeat"
-                             _ -> "error!"

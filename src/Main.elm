@@ -3,8 +3,9 @@ port module Main exposing (..)
 import Browser
 import Html exposing (Html, button, div, input, text, node, ul, li, textarea, span)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick, onInput)
-import Parser exposing (run, DeadEnd, Problem (..))
+import Html.Events exposing ( onClick, onInput )
+import Parser exposing ( run, DeadEnd, Problem (..) )
+import Parsec exposing ( problem2String )
 import ImpParser as IP
 import VM as VM
 import Set as S
@@ -117,7 +118,7 @@ view model =
                      , onClick <| Eval model.input ] [ text "run" ]
             , ul [] <|
                 List.map (\err ->
-                              li [] [ text <| IP.problem2String err.problem
+                              li [] [ text <| problem2String err.problem
                                     , div [] [ text <| ", col: " ++ String.fromInt err.col ]
                                     ]
                          ) model.errors
