@@ -4,4 +4,7 @@ elm-stuff
 repl-temp-*
 *~
 index.html
-*.js
+index.js
+imp.js
+test.js
+main.js
