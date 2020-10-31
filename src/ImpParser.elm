@@ -49,7 +49,7 @@ intLit =
 
 myInt : Parser Int
 myInt =
-    Parser.map (String.foldr (\c d -> d * 10 + Char.toCode c - 48) 0)
+    Parser.map (String.foldl (\c d -> d * 10 + Char.toCode c - 48) 0)
     <| getChompedString
     <| succeed ()
             |. chompIf Char.isDigit
